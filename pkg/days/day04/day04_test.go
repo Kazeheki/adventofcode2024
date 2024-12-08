@@ -9,15 +9,15 @@ import (
 func TestWithExampleInput(t *testing.T) {
 	slog.SetLogLoggerLevel(slog.LevelDebug)
 	input := `MMMSXXMASM
-	   MSAMXMSMSA
-	   AMXSXMAAMM
-	   MSAMASMSMX
-	   XMASAMXAMM
-	   XXAMMXXAMA
-	   SMSMSASXSS
-	   SAXAMASAAA
-	   MAMMMXMMMM
-	   MXMXAXMASX`
+MSAMXMSMSA
+AMXSXMAAMM
+MSAMASMSMX
+XMASAMXAMM
+XXAMMXXAMA
+SMSMSASXSS
+SAXAMASAAA
+MAMMMXMMMM
+MXMXAXMASX`
 	content := []byte(input)
 	result1, result2, err := Process(&content)
 
@@ -30,7 +30,7 @@ func TestWithExampleInput(t *testing.T) {
 		t.Error("expected result1 to be " + expected + " but was " + result1)
 	}
 
-	expected = ""
+	expected = "9"
 	if result2 != expected {
 		t.Error("expected result2 to be " + expected + " but was " + result2)
 	}
