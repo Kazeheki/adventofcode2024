@@ -1,7 +1,6 @@
 package days
 
 import (
-	"log/slog"
 	"regexp"
 	"strconv"
 
@@ -48,39 +47,14 @@ func hasXMAS(input [][]byte, x int, y int, height Range, direction Direction) bo
 	for step := range len("XMAS") {
 		nextX := x + (dirX * step)
 		nextY := y + (dirY * step)
-		width := Range{start: 0, end: len(input[nextY])}
-		if height.canHandle(nextY) && width.canHandle(nextX) {
-			defer func() {
-				if recov := recover(); recov != nil {
-					slog.Error(
-						"runtime error",
-						recov,
-						"x",
-						x,
-						"y",
-						y,
-						"step",
-						step,
-						"nextx",
-						nextX,
-						"nexty",
-						nextY,
-						"height",
-						height,
-						"width",
-						width,
-						"direction",
-						direction.String(),
-						"line",
-						input[nextY],
-					)
-					panic(recov)
-				}
-			}()
-			str += string(input[nextY][nextX])
-		} else {
+		if !height.canHandle(nextY) {
 			break
 		}
+		width := Range{start: 0, end: len(input[nextY])}
+		if !width.canHandle(nextX) {
+			break
+		}
+		str += string(input[nextY][nextX])
 	}
 	return str == "XMAS"
 }

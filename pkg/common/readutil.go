@@ -34,10 +34,14 @@ func ReadAsTwoDimensionalArray(content *[]byte) [][]byte {
 	var result [][]byte
 	for scanner.Scan() {
 		lineBytes := scanner.Bytes()
+		// scanner.Bytes gives back the internal array that it might override again!
+		// copy to not have strange issues with lines being overwritten.
+		tmp := make([]byte, len(lineBytes))
+		copy(tmp, lineBytes)
 		if err := scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
-		result = append(result, lineBytes)
+		result = append(result, tmp)
 	}
 
 	return result

@@ -1,9 +1,7 @@
 package days
 
 import (
-	"fmt"
 	"log/slog"
-	"os"
 	"strconv"
 	"testing"
 )
@@ -134,62 +132,5 @@ X...
 				t.Error("expected result1 to be " + expected + " but was " + result1)
 			}
 		})
-	}
-}
-
-func TestPart1WithRealInput(t *testing.T) {
-	input, err := os.ReadFile(fmt.Sprintf(`../../../input/day%02d`, 4))
-	if err != nil {
-		panic("could not find file")
-	}
-	content := []byte(input)
-	_, _, err = Process(&content)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func TestRemoveMe(t *testing.T) {
-	slog.SetLogLoggerLevel(slog.LevelDebug)
-	input := `1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-`
-
-	content := []byte(input)
-	_, _, err := Process(&content)
-
-	if err != nil {
-		t.Fatal(err)
 	}
 }
