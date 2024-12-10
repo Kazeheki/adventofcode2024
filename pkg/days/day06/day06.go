@@ -22,21 +22,15 @@ func Process(content *[]byte) (string, string, error) {
 
 func part1(content *[]byte) (string, error) {
 	board := newBoard(content)
-	guardPosition := board.guardStart
+	guard := board.guardStart
+	board.markAsVisited(guard.position)
 
-	for {
-		nextPosition := guardPosition.nextPosition()
-		if !board.isValidPosition(nextPosition) {
-			break
-		}
-		switch board.tileAt(nextPosition) {
-		case EMPTY:
-			guardPosition = nextPosition
-			board.markAsVisited(guardPosition)
-		case OBSTACLE:
-			guardPosition.lookDirection = guardPosition.lookDirection.turnRight()
-		default:
-			guardPosition = nextPosition
+	for guard.stillWalksOnFloor(board) {
+		if guard.canWalk(board) {
+			guard.walk()
+			board.markAsVisited(guard.position)
+		} else {
+			guard.turnRight()
 		}
 	}
 
@@ -72,25 +66,48 @@ func (d direction) turnRight() direction {
 	}
 }
 
-func (pos position) nextPosition() position {
-	switch pos.lookDirection {
+type position struct {
+	x int
+	y int
+}
+
+func (p position) nextPositionInDirection(d direction) position {
+	switch d {
 	case UP:
-		return position{x: pos.x, y: pos.y - 1, lookDirection: UP}
+		p.y = p.y - 1
 	case RIGHT:
-		return position{x: pos.x + 1, y: pos.y, lookDirection: RIGHT}
+		p.x = p.x + 1
 	case DOWN:
-		return position{x: pos.x, y: pos.y + 1, lookDirection: DOWN}
+		p.y = p.y + 1
 	case LEFT:
-		return position{x: pos.x - 1, y: pos.y, lookDirection: LEFT}
+		p.x = p.x - 1
 	default:
 		panic("unknown direction")
 	}
+	return p
 }
 
-type position struct {
-	x             int
-	y             int
+type guard struct {
+	position      position
 	lookDirection direction
+}
+
+func (g *guard) walk() {
+	g.position = g.position.nextPositionInDirection(g.lookDirection)
+}
+
+func (g *guard) canWalk(b board) bool {
+	target := g.position.nextPositionInDirection(g.lookDirection)
+	return b.isValidPosition(target) && b.tileAt(target) != OBSTACLE
+}
+
+func (g *guard) stillWalksOnFloor(b board) bool {
+	target := g.position.nextPositionInDirection(g.lookDirection)
+	return b.isValidPosition(target)
+}
+
+func (g *guard) turnRight() {
+	g.lookDirection = g.lookDirection.turnRight()
 }
 
 type tile int
@@ -105,7 +122,7 @@ type board struct {
 	floorPlan  [][]tile
 	height     int
 	width      int
-	guardStart position
+	guardStart guard
 }
 
 func newBoard(content *[]byte) board {
@@ -130,7 +147,7 @@ func newBoard(content *[]byte) board {
 				tile = OBSTACLE
 			case '^':
 				tile = VISITED
-				board.guardStart = position{x, y, UP}
+				board.guardStart = guard{position{x, y}, UP}
 			default:
 				panic(fmt.Sprintf("invalid floor item '%q'", character))
 			}
